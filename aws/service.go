@@ -2009,7 +2009,7 @@ func getSessionWithMaxRetries(ctx context.Context, d *plugin.QueryData, region s
 	sessionOptions := session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 		Config: aws.Config{
-			Region:     &region,
+			Region:     aws.String(region),
 			MaxRetries: aws.Int(maxRetries),
 			Retryer:    NewConnectionErrRetryer(maxRetries, minRetryDelay, ctx),
 		},
@@ -2027,6 +2027,9 @@ func getSessionWithMaxRetries(ctx context.Context, d *plugin.QueryData, region s
 	if awsEndpointUrl != "" {
 		sessionOptions.Config.Endpoint = aws.String(awsEndpointUrl)
 	}
+
+	// NOTE: This is a service setting and not a general setting, this has been moved to how the resource is instatiated.
+	// See here - https://stackoverflow.com/questions/66137645/how-do-i-configure-s3forcepathstyle-with-aws-golang-v2-sdk
 
 	if awsConfig.S3ForcePathStyle != nil {
 		sessionOptions.Config.S3ForcePathStyle = awsConfig.S3ForcePathStyle
